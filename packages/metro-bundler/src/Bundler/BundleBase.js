@@ -11,7 +11,9 @@
 'use strict';
 
 const ModuleTransport = require('../lib/ModuleTransport');
-
+const path = require('path');
+const customConfig = require(path.resolve(process.pwd(), 'config.json'))
+const ModuleMaps = require(path.resolve(process.pwd(), customConfig.outputPath));
 export type FinalizeOptions = {
   allowUpdates?: boolean,
   runBeforeMainModule?: Array<string>,
@@ -55,7 +57,22 @@ class BundleBase {
       throw new Error('Expected a ModuleTransport object');
     }
 
+    // 打包环境才过滤(打基础包时不需要过滤)
+    if(process.env.NODE_ENV === 'production' && customConfig && !customConfig.isBase){
+        let _t = this.isBase(module)
+        // 如果基础包中已经存在则不添加到modules中
+        if(_t.length){
+            return this.__modules
+        }
+    }
+
     return this.__modules.push(module) - 1;
+  }
+
+  isBase(module){
+      return ModuleMaps.filter(elem => {
+          return module.id === elem.id
+      })
   }
 
   replaceModuleAt(index: number, module: ModuleTransport) {

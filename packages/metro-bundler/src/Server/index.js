@@ -25,7 +25,7 @@ const parsePlatformFilePath = require('../node-haste/lib/parsePlatformFilePath')
 const path = require('path');
 const symbolicate = require('./symbolicate');
 const url = require('url');
-
+const customConfig = require(process.pwd() + '/config.json');
 import type Module, {HasteImpl} from '../node-haste/Module';
 import type {IncomingMessage, ServerResponse} from 'http';
 import type ResolutionResponse
@@ -276,6 +276,24 @@ class Server {
   async buildBundle(options: BundleOptions): Promise<Bundle> {
     const bundle = await this._bundler.bundle(options);
     const modules = bundle.getModules();
+
+    // 用于基础包导出配置文件(读取配置文件判断是否需要导出配置文件)
+    if(process.env.NODE_ENV === 'production' && customConfig && customConfig.common){
+      let _module = []
+      modules.map((elem, index) => {
+          let  { sourcePath } = elem
+          sourcePath = sourcePath.replace(process.pwd() + '/node_modules/', '');
+          _module.push({
+              name: elem.name,
+              sourcePath: sourcePath,
+              id: 10000 + index,
+              path: sourcePath.replace('.js', '')
+          })
+      })
+      fs.writeFile(process.pwd() + '/modules.json', JSON.stringify(_module));
+    }
+
+
     const nonVirtual = modules.filter(m => !m.virtual);
     bundleDeps.set(bundle, {
       files: new Map(

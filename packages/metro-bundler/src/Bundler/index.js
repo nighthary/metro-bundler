@@ -26,7 +26,6 @@ const path = require('path');
 const denodeify = require('denodeify');
 const defaults = require('../defaults');
 const toLocalPath = require('../node-haste/lib/toLocalPath');
-
 const {generateAssetTransformResult, isAssetTypeAnImage} = require('./util');
 
 const {
@@ -38,6 +37,8 @@ const {
 
 const VERSION = require('../../package.json').version;
 
+const customConfig = require(path.resolve(process.pwd(), 'config.json'))
+const ModuleMaps = require(path.resolve(process.pwd(), customConfig.outputPath));
 import type AssetServer from '../AssetServer';
 import type Module, {HasteImpl} from '../node-haste/Module';
 import type ResolutionResponse from '../node-haste/DependencyGraph/ResolutionResponse';
@@ -836,11 +837,32 @@ function createModuleIdFactory() {
   let nextId = 0;
   return ({path: modulePath}) => {
     if (!(modulePath in fileToIdMap)) {
-      fileToIdMap[modulePath] = nextId;
-      nextId += 1;
+        // 打包环境才进行自定义id的修改
+        if(process.env.NODE_ENV === 'production'){
+            const customId = getCustomModuleId(modulePath)
+            if(customId){
+                fileToIdMap[modulePath] = customId
+            } else {
+                fileToIdMap[modulePath] = nextId
+                nextId += 1
+            }
+            // fileToIdMap[modulePath] = nextId
+            // nextId += 1
+        } else {
+            fileToIdMap[modulePath] = nextId
+            nextId += 1
+        }
     }
     return fileToIdMap[modulePath];
   };
+}
+
+function getCustomModuleId(modulePath){
+    let _t = ModuleMaps.filter(elem => {
+      return modulePath.indexOf(elem.sourcePath) > -1
+    })
+
+    return _t[0] && _t[0].id
 }
 
 function getMainModule({dependencies, numPrependedDependencies = 0}) {

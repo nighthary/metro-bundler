@@ -12,8 +12,8 @@
 
 const ModuleTransport = require('../lib/ModuleTransport');
 const path = require('path');
-const customConfig = require(path.resolve(process.pwd(), 'config.json'))
-const ModuleMaps = require(path.resolve(process.pwd(), customConfig.outputPath));
+const customConfig = require(path.resolve(process.cwd(), 'config.json'))
+const ModuleMaps = require(path.resolve(process.cwd(), customConfig.outputPath));
 export type FinalizeOptions = {
   allowUpdates?: boolean,
   runBeforeMainModule?: Array<string>,

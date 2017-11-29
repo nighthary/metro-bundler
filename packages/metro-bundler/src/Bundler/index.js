@@ -37,8 +37,8 @@ const {
 
 const VERSION = require('../../package.json').version;
 
-const customConfig = require(path.resolve(process.pwd(), 'config.json'))
-const ModuleMaps = require(path.resolve(process.pwd(), customConfig.outputPath));
+const customConfig = require(path.resolve(process.cwd(), 'config.json'));
+const ModuleMaps = !customConfig.common && require(path.resolve(process.cwd(), customConfig.outputPath));
 import type AssetServer from '../AssetServer';
 import type Module, {HasteImpl} from '../node-haste/Module';
 import type ResolutionResponse from '../node-haste/DependencyGraph/ResolutionResponse';
@@ -838,19 +838,25 @@ function createModuleIdFactory() {
   return ({path: modulePath}) => {
     if (!(modulePath in fileToIdMap)) {
         // 打包环境才进行自定义id的修改
-        if(process.env.NODE_ENV === 'production'){
-            const customId = getCustomModuleId(modulePath)
-            if(customId){
-                fileToIdMap[modulePath] = customId
+        if (process.env.NODE_ENV === 'production' && customConfig && !customConfig.common) {
+          const customId = getCustomModuleId(ModuleMaps, modulePath);
+          if (customId) {
+            fileToIdMap[modulePath] = customId;
+          } else {
+            // 修改业务包入口的模块Id(由config.json配置)
+            if(!nextId){
+              fileToIdMap[modulePath] = customConfig.entryModuleId;
             } else {
-                fileToIdMap[modulePath] = nextId
-                nextId += 1
+              fileToIdMap[modulePath] = nextId;
             }
-            // fileToIdMap[modulePath] = nextId
-            // nextId += 1
+
+            nextId += 1;
+          }
+          // fileToIdMap[modulePath] = nextId
+          // nextId += 1
         } else {
-            fileToIdMap[modulePath] = nextId
-            nextId += 1
+          fileToIdMap[modulePath] = nextId;
+          nextId += 1;
         }
     }
     return fileToIdMap[modulePath];

@@ -1,0 +1,7 @@
+{
+  "common": true,
+  "version": "0.1.0",
+  "desc": "bundle config",
+  "outputPath": "modules.json",
+  "entryModuleId": "666666"
+}

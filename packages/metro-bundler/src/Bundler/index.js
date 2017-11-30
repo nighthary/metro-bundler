@@ -839,7 +839,7 @@ function createModuleIdFactory() {
     if (!(modulePath in fileToIdMap)) {
         // 打包环境才进行自定义id的修改
         if (process.env.NODE_ENV === 'production' && customConfig && !customConfig.common) {
-          const customId = getCustomModuleId(ModuleMaps, modulePath);
+          const customId = getCustomModuleId(modulePath);
           if (customId) {
             fileToIdMap[modulePath] = customId;
           } else {

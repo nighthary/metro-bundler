@@ -17,9 +17,34 @@ This project was previously part of the [react-native](https://github.com/facebo
 
 ## Custom
 
-添加自定义的模块id,对基础包和业务包进行拆分功能.
+```js
+npm install
+
+# 发布
+npm run publish
+
+# 本地发布(预发布)
+npm run pre-publish
+
+# 本地编译
+npm run build
+
+# 清理build目录
+npm run build-clean
+
+# 清理预发布目录
+npm run pre-publish-clean
+```
 
 
+
+
+
+
+
+
+
+> 添加自定义的模块id,对基础包和业务包进行拆分功能.
 
 在项目根目录添加config.json进行打包配置
 
@@ -37,9 +62,9 @@ This project was previously part of the [react-native](https://github.com/facebo
 
 ​	**必须**
 
-> :标志本次打包是否为打基础包
+>:标志本次打包是否为打基础包
 >
-> 如果为打基础包,则会生成modules.json和对应的基础包,打包命令和方式和官方一致
+>如果为打基础包,则会生成modules.json和对应的基础包,打包命令和方式和官方一致
 
 **version** 版本号
 

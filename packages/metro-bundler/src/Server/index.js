@@ -299,7 +299,7 @@ class Server {
 
       if(customConfig && customConfig.common){
           // 生成基础包映射文件
-          fs.writeFile(process.cwd() + '/modules.json', JSON.stringify(_module));
+          fs.writeFile(path.resolve(process.cwd(), customConfig.outputPath || 'modules.json'), JSON.stringify(_module));
       } else { // build business bundle
           // 打业务包时自动裁剪最后两行代码的引用
           _modules.splice(_modules.length - 2, _modules.length)

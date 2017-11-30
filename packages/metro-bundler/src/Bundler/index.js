@@ -38,7 +38,7 @@ const {
 const VERSION = require('../../package.json').version;
 
 const customConfig = require(path.resolve(process.cwd(), 'config.json'));
-const ModuleMaps = !customConfig.common && require(path.resolve(process.cwd(), customConfig.outputPath));
+const ModuleMaps = !customConfig.common && require(path.resolve(process.cwd(), customConfig.outputPath || 'modules.json'));
 import type AssetServer from '../AssetServer';
 import type Module, {HasteImpl} from '../node-haste/Module';
 import type ResolutionResponse from '../node-haste/DependencyGraph/ResolutionResponse';

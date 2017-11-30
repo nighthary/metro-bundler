@@ -58,7 +58,7 @@ class BundleBase {
     }
 
     // 打包环境才过滤(打基础包时不需要过滤)
-    if(process.env.NODE_ENV === 'production' && customConfig && !customConfig.isBase){
+    if(process.env.NODE_ENV === 'production' && customConfig && !customConfig.common){
         let _t = this.isBase(module)
         // 如果基础包中已经存在则不添加到modules中
         if(_t.length){

@@ -50,17 +50,21 @@ npm run pre-publish-clean
 
 ```json
 {
-  "common": false,
+  "common": true,
   "version": "0.1.0",
   "desc": "bundle config",
   "outputPath": "modules.json",
-  "entryModuleId": "TAOFILM12398"
+  "entryModuleId": 666666
 }
 ```
 
 **common**  是否为基础包
 
 ​	**必须**
+
+​	true-基础包 
+
+​	false-业务包
 
 >:标志本次打包是否为打基础包
 >

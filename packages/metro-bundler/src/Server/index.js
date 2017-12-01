@@ -280,29 +280,29 @@ class Server {
 
     // 用于基础包导出配置文件(读取配置文件判断是否需要导出配置文件)
     if (process.env.NODE_ENV === 'production') {
-      let _module = [], _modules = [];
+      let _module = [],_modules = [];
       modules.map(function (elem, index) {
         const _tmp = Object.assign({}, elem),
-              moduleId = 10000 + index,
-              sourcePath = _tmp.sourcePath;
+        sourcePath = _tmp.sourcePath;
 
-        _module.push({
-          name: _tmp.name,
-          sourcePath: sourcePath.replace(process.cwd() + '/node_modules/', ''),
-          id: moduleId,
-          path: sourcePath.replace('.js', '')
-        });
+        if(_tmp.id >= 0){ //  过滤最后的模块加载
+          _module.push({
+            name: _tmp.name,
+            sourcePath: sourcePath.replace(process.cwd() + '/node_modules/', ''),
+            id: _tmp.id,
+            path: sourcePath.replace('.js', '') 
+          });
+        }
 
-        _tmp.id = moduleId;
-        _modules.push(_tmp)
+        _modules.push(_tmp);
       });
 
-      if(customConfig && customConfig.common){
-          // 生成基础包映射文件
-          fs.writeFile(path.resolve(process.cwd(), customConfig.outputPath || 'modules.json'), JSON.stringify(_module));
-      } else { // build business bundle
-          // 打业务包时自动裁剪最后两行代码的引用
-          _modules.splice(_modules.length - 2, _modules.length)
+      if (customConfig && customConfig.common) {
+        // 生成基础包映射文件
+        fs.writeFile(path.resolve(process.cwd(), customConfig.outputPath || 'modules.json'), JSON.stringify(_module));
+      } else {// build business bundle
+        // 打业务包时自动裁剪最后两行代码的引用
+        _modules.splice(_modules.length - 2, _modules.length);
       }
       // 生成映射文件的同时生成基础包，修改运行环境中的modulesId
       bundle.__modules = _modules;

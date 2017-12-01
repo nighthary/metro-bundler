@@ -834,30 +834,37 @@ function verifyRootExists(root) {
 
 function createModuleIdFactory() {
   const fileToIdMap = Object.create(null);
-  let nextId = 0;
+  let nextId = 0, nextBaseId = 10001;
   return ({path: modulePath}) => {
     if (!(modulePath in fileToIdMap)) {
         // 打包环境才进行自定义id的修改
-        if (process.env.NODE_ENV === 'production' && customConfig && !customConfig.common) {
+      if (process.env.NODE_ENV === 'production') {
+        if(customConfig && customConfig.common){ // 基础包时修改id
+          fileToIdMap[modulePath] = nextBaseId;
+          nextBaseId += 1;
+        } else if(customConfig && !customConfig.common){ // 业务包时替换基础包中模块的id
           const customId = getCustomModuleId(modulePath);
-          if (customId) {
+          if (customId) { // 基础包
             fileToIdMap[modulePath] = customId;
-          } else {
+          } else { // 业务包内容
             // 修改业务包入口的模块Id(由config.json配置)
-            if(!nextId){
+            if (!nextId) {
               fileToIdMap[modulePath] = customConfig.entryModuleId;
             } else {
               fileToIdMap[modulePath] = nextId;
             }
-
             nextId += 1;
           }
-          // fileToIdMap[modulePath] = nextId
-          // nextId += 1
         } else {
           fileToIdMap[modulePath] = nextId;
           nextId += 1;
         }
+        // fileToIdMap[modulePath] = nextId
+        // nextId += 1
+      } else {
+        fileToIdMap[modulePath] = nextId;
+        nextId += 1;
+      }
     }
     return fileToIdMap[modulePath];
   };
